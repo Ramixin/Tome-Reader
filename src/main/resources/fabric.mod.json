@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "tomereader",
+  "version": "${version}",
+  "name": "TomeReader",
+  "description": "Allows the player to put enchanted books on lecterns",
+  "authors": [
+    "RamGames"
+  ],
+  "contact": {
+    "repo": "https://github.com/RamGemes/TomeReader"
+  },
+  "license": "MIT",
+  "icon": "assets/tomereader/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "net.ramgames.tomereader.client.TomeReaderClient"
+    ],
+    "main": [
+      "net.ramgames.tomereader.TomeReader"
+    ]
+  },
+  "mixins": [
+    "tomereader.mixins.json",
+    {
+      "config": "tomereader.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": ">=1.20.2"
+  }
+}
