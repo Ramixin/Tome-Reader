@@ -14,7 +14,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.ramgames.tomereader.TomeReader;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,6 +37,7 @@ public abstract class BlockEntityMixin {
     @Inject(method = "markDirty()V", at = @At("TAIL"))
     private void addPacketToMarkDirty(CallbackInfo ci) {
         if(!(((BlockEntity)(Object)this) instanceof LecternBlockEntity lectern)) return;
+        if(this.getWorld() == null) return;
         if(!this.getWorld().isClient()) {
             PacketByteBuf data = PacketByteBufs.create();
             data.writeBlockPos(getPos());
@@ -50,12 +50,12 @@ public abstract class BlockEntityMixin {
 
     @Inject(method = "toInitialChunkDataNbt", at = @At("HEAD"), cancellable = true)
     private void addLecternInitialChunkDataNbt(CallbackInfoReturnable<NbtCompound> cir) {
-        if(!(((BlockEntity)(Object)this) instanceof LecternBlockEntity lectern)) return;
+        if(!(((BlockEntity)(Object)this) instanceof LecternBlockEntity ignored)) return;
         cir.setReturnValue(this.createNbt());
     }
     @Inject(method = "toUpdatePacket", at = @At("HEAD"), cancellable = true)
     private void addLecternUpdatePacket(CallbackInfoReturnable<Packet<ClientPlayPacketListener>> cir) {
-        if(!(((BlockEntity)(Object)this) instanceof LecternBlockEntity lectern)) return;
+        if(!(((BlockEntity)(Object)this) instanceof LecternBlockEntity ignored)) return;
         cir.setReturnValue(BlockEntityUpdateS2CPacket.create((BlockEntity) (Object)this));
     }
 }

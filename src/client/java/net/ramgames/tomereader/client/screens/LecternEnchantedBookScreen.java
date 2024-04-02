@@ -47,9 +47,9 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
     private final int playerXPLevel;
     private final boolean isCreative;
 
-    private static final Identifier LEVEL_TEXTURE = new Identifier("minecraft:textures/gui/sprites/container/enchanting_table/level_3.png");
-    private static final Identifier DISABLED_LEVEL_TEXTURE = new Identifier("minecraft:textures/gui/sprites/container/enchanting_table/level_3_disabled.png");
-    private static final Identifier ENCHANTMENT_TABLE_TEXTURE = new Identifier("minecraft:textures/gui/container/enchanting_table.png");
+    private static final Identifier LEVEL_TEXTURE = new Identifier("container/enchanting_table/level_3");
+    private static final Identifier DISABLED_LEVEL_TEXTURE = new Identifier("container/enchanting_table/level_3_disabled");
+    //private static final Identifier ENCHANTMENT_TABLE_TEXTURE = new Identifier("minecraft:textures/gui/container/enchanting_table.png");
 
     public LecternEnchantedBookScreen(LecternEnchantedBookScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -71,7 +71,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
         context.drawTooltip(this.textRenderer, tooltip.getLeft(), (context.getScaledWindowWidth()-tooltip.getRight()-22)/2, this.height/2+30-(tooltip.getLeft().size()-3)*10);
         if(transferButton != null) {
             //context.drawTexture(ENCHANTMENT_TABLE_TEXTURE,this.width / 2 - 98, 222, 32, transferButton.active ? 223 : 239, 16, 16);
-            context.drawTexture(transferButton.active ? LEVEL_TEXTURE : DISABLED_LEVEL_TEXTURE, this.width / 2 - 98, 222, 16,16,16, 16);
+            context.drawGuiTexture(transferButton.active ? LEVEL_TEXTURE : DISABLED_LEVEL_TEXTURE, this.width / 2 - 98,222, 16, 16);
         }
 
 
@@ -82,9 +82,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
         if(this.client == null) return;
         if(this.client.player == null) return;
         if (this.client.player.canModifyBlocks()) {
-            this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-                this.close();
-            }).dimensions(this.width / 2 - 100, 196, 98, 20).build());
+            this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.close()).dimensions(this.width / 2 - 100, 196, 98, 20).build());
             this.addDrawableChild(ButtonWidget.builder(Text.translatable("lectern.take_book"), (button) -> {
                 this.sendButtonPressPacket(3);
                 this.close();
