@@ -34,9 +34,4 @@ public class BlockMixin {
         BlockMixinHotSwapper.addEnchantParticlesToLectern(state,world,pos,random,ci);
     }
 
-    /*@Inject(method = "hasRandomTicks", at = @At("HEAD"), cancellable = true)
-    private void allowLecternToRandomTick(BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if(state.getBlock() instanceof LecternBlock) cir.setReturnValue(true);
-    }*/
-
 }

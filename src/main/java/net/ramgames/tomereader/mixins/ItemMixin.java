@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Item.class)
 public class ItemMixin {
 
+    @SuppressWarnings("UnreachableCode")
     @Inject(method = "useOnBlock", at = @At("HEAD"), cancellable = true)
     public void addEnchantedBookInteraction(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
         if( ((Item)(Object)this) instanceof EnchantedBookItem) {

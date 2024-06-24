@@ -16,7 +16,6 @@ public interface BlockMixinHotSwapper {
     static void addEnchantParticlesToLectern(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
         if(state.getBlock() != Blocks.LECTERN) return;
         if(!(world.getBlockEntity(pos) instanceof LecternBlockEntity lectern)) return;
-        //TomeReader.LOGGER.info("item: "+lectern.getBook());
         if(lectern.getBook().getItem() != Items.ENCHANTED_BOOK) return;
         if(random.nextBoolean()) return;
         for(int i = 0; i < 3; i++) {

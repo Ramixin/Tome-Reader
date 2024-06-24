@@ -9,11 +9,12 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.model.BookModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
-import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.EnchantedBookItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -31,7 +32,7 @@ import java.util.List;
 
 public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBookScreenHandler> {
 
-    private static final Identifier BOOK_TEXTURE = new Identifier("textures/entity/enchanting_table_book.png");
+    private static final Identifier BOOK_TEXTURE = Identifier.of("textures/entity/enchanting_table_book.png");
     private BookModel BOOK_MODEL;
     public float nextPageAngle;
     public float pageAngle;
@@ -47,9 +48,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
     private final int playerXPLevel;
     private final boolean isCreative;
 
-    private static final Identifier LEVEL_TEXTURE = new Identifier("container/enchanting_table/level_3");
-    private static final Identifier DISABLED_LEVEL_TEXTURE = new Identifier("container/enchanting_table/level_3_disabled");
-    //private static final Identifier ENCHANTMENT_TABLE_TEXTURE = new Identifier("minecraft:textures/gui/container/enchanting_table.png");
+    private static final Identifier ENCHANTMENT_TABLE_TEXTURE = Identifier.of("minecraft:textures/gui/container/enchanting_table.png");
 
     public LecternEnchantedBookScreen(LecternEnchantedBookScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -63,6 +62,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         Pair<List<Text>, Integer> tooltip = generateToolTip();
         int y = this.y+(backgroundHeight)/2+5;
@@ -70,8 +70,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
         drawBook(context, this.width/2, y, delta);
         context.drawTooltip(this.textRenderer, tooltip.getLeft(), (context.getScaledWindowWidth()-tooltip.getRight()-22)/2, this.height/2+30-(tooltip.getLeft().size()-3)*10);
         if(transferButton != null) {
-            //context.drawTexture(ENCHANTMENT_TABLE_TEXTURE,this.width / 2 - 98, 222, 32, transferButton.active ? 223 : 239, 16, 16);
-            context.drawGuiTexture(transferButton.active ? LEVEL_TEXTURE : DISABLED_LEVEL_TEXTURE, this.width / 2 - 98,222, 16, 16);
+            context.drawTexture(ENCHANTMENT_TABLE_TEXTURE,this.width / 2 - 98, 222, 32, transferButton.active ? 223 : 239, 16, 16);
         }
 
 
@@ -104,10 +103,11 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
     private Pair<List<Text>, Integer> generateToolTip() {
         List<Text> list = new ArrayList<>();
         ItemStack stack = this.handler.getInventory().getStack(0);
-        MutableText name = Text.empty().append(stack.getName()).formatted(stack.getRarity().formatting);
-        if(stack.hasCustomName()) name.formatted(Formatting.ITALIC);
+        MutableText name = Text.empty().append(stack.getName()).formatted(stack.getRarity().getFormatting());
+        if(stack.contains(DataComponentTypes.CUSTOM_NAME)) name.formatted(Formatting.ITALIC);
         list.add(name);
-        ItemStack.appendEnchantments(list, EnchantedBookItem.getEnchantmentNbt(stack));
+        if(stack.contains(DataComponentTypes.STORED_ENCHANTMENTS))
+            stack.get(DataComponentTypes.STORED_ENCHANTMENTS).appendTooltip(Item.TooltipContext.DEFAULT, list::add, TooltipType.BASIC);
         int max = 0;
         for(Text text : list) max = Math.max(max, textRenderer.getWidth(text));
         return new Pair<>(list, max);
@@ -139,7 +139,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
         context.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
         BookModelHelper.setBookAngles(this.BOOK_MODEL, delta, pageTurningSpeed, nextPageTurningSpeed, pageAngle, nextPageAngle);
         VertexConsumer vertexConsumer = context.getVertexConsumers().getBuffer(this.BOOK_MODEL.getLayer(BOOK_TEXTURE));
-        this.BOOK_MODEL.render(context.getMatrices(), vertexConsumer, 15728880, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.BOOK_MODEL.render(context.getMatrices(), vertexConsumer, 15728880, OverlayTexture.DEFAULT_UV);
         context.draw();
         context.getMatrices().pop();
         DiffuseLighting.enableGuiDepthLighting();
@@ -155,21 +155,6 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
         nextPageTurningSpeed = update[4];
         pageRotationSpeed = update[5];
         ++this.ticks;
-        /*
-        if(this.random.nextBetween(1,75) == 1 || ticks == 0) do {
-            this.approximatePageAngle += (float)(this.random.nextInt(4) - this.random.nextInt(4));
-        } while(this.nextPageAngle <= this.approximatePageAngle + 1.0F && this.nextPageAngle >= this.approximatePageAngle - 1.0F);
-
-
-        this.pageAngle = this.nextPageAngle;
-        this.pageTurningSpeed = this.nextPageTurningSpeed;
-        this.nextPageTurningSpeed += 0.2F;
-        this.nextPageTurningSpeed = MathHelper.clamp(this.nextPageTurningSpeed, 0.0F, 1.0F);
-        float f = (this.approximatePageAngle - this.nextPageAngle) * 0.4F;
-        float g = 0.2F;
-        f = MathHelper.clamp(f, -g, g);
-        this.pageRotationSpeed += (f - this.pageRotationSpeed) * 0.9F;
-        this.nextPageAngle += this.pageRotationSpeed;*/
         updateTransferButton();
         super.handledScreenTick();
     }
@@ -184,7 +169,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
 
     private void updateTransferButton() {
         if(this.transferButton == null) return;
-        if(EnchantmentHelper.get(handler.getInventory().getStack(0)).size() <= 1) {
+        if(handler.getInventory().getStack(0).contains(DataComponentTypes.STORED_ENCHANTMENTS) && handler.getInventory().getStack(0).get(DataComponentTypes.STORED_ENCHANTMENTS).getSize() <= 1) {
             if(transferButton.active || disabledIndex != 1) {
                 transferButton.active = false;
                 transferButton.setTooltip(Tooltip.of(Text.literal("Cannot transfer single enchantment").formatted(Formatting.WHITE)));

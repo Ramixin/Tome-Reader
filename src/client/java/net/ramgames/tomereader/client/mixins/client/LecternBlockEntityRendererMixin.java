@@ -86,7 +86,7 @@ public abstract class LecternBlockEntityRendererMixin implements BlockEntityRend
         float o = MathHelper.lerp(f, 1.2F, 1.2F);
         this.book.setPageAngles(gg, MathHelper.clamp(m, 0.0F, 1.0F), MathHelper.clamp(n, 0.0F, 1.0F), o);
         VertexConsumer vertexConsumer = BOOK_TEXTURE.getVertexConsumer(vertexConsumerProvider, RenderLayer::getEntitySolid);
-        this.book.renderBook(matrixStack, vertexConsumer, i, j, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.book.renderBook(matrixStack, vertexConsumer, i, j, -1);
         matrixStack.pop();
         ci.cancel();
     }

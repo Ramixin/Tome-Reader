@@ -1,5 +1,7 @@
 package net.ramgames.tomereader.screenhandlers;
 
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
@@ -10,6 +12,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -22,6 +25,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.ramgames.tomereader.TomeReader;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class LecternEnchantedBookScreenHandler extends ScreenHandler {
@@ -81,14 +85,18 @@ public class LecternEnchantedBookScreenHandler extends ScreenHandler {
             if(mainStack.getItem() != Items.BOOK || mainStack.getCount() != 1 || (player.experienceLevel < 3 && !player.getAbilities().creativeMode)) return false;
             player.addExperienceLevels(-3);
             player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1, Math.max(1F, player.getRandom().nextFloat()+0.3F));
-            Map<Enchantment, Integer> enchantments = EnchantmentHelper.get(this.inventory.getStack(0));
-            Enchantment transferEnchant = enchantments.keySet().stream().toList().get(player.getRandom().nextBetween(0, enchantments.size()-1));
-            EnchantedBookItem.addEnchantment(enchantedBook, new EnchantmentLevelEntry(transferEnchant, enchantments.get(transferEnchant)));
+
+            ItemEnchantmentsComponent enchants = this.inventory.getStack(0).get(DataComponentTypes.STORED_ENCHANTMENTS);
+            RegistryEntry<Enchantment> transferEnchant = enchants.getEnchantments().stream().iterator().next();
+            ItemEnchantmentsComponent.Builder bookBuilder = new ItemEnchantmentsComponent.Builder(enchantedBook.getEnchantments());
+            bookBuilder.add(transferEnchant, enchants.getLevel(transferEnchant));
+            enchantedBook.set(DataComponentTypes.STORED_ENCHANTMENTS, bookBuilder.build());
             player.setStackInHand(Hand.MAIN_HAND, enchantedBook);
-            enchantments.remove(transferEnchant);
-            ItemStack referenceStack = this.inventory.getStack(0);
-            referenceStack.removeSubNbt(EnchantedBookItem.STORED_ENCHANTMENTS_KEY);
-            EnchantmentHelper.set(enchantments, referenceStack);
+
+            ItemEnchantmentsComponent.Builder stackBuilder = new ItemEnchantmentsComponent.Builder(enchants);
+            stackBuilder.remove(entry -> entry == transferEnchant);
+
+            this.inventory.getStack(0).set(DataComponentTypes.STORED_ENCHANTMENTS, stackBuilder.build());
             inventory.markDirty();
             slot.markDirty();
             return true;
