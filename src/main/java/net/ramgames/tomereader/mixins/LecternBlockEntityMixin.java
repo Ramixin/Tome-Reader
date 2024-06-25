@@ -8,9 +8,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.EnchantedBookItem;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import net.ramgames.tomereader.LecternAccess;
+import net.ramgames.tomereader.TomeReader;
 import net.ramgames.tomereader.screenhandlers.LecternEnchantedBookScreenHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +21,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LecternBlockEntity.class)
@@ -33,15 +37,14 @@ public abstract class LecternBlockEntityMixin extends BlockEntity implements Lec
     @Unique
     public float flipTurn;
     @Unique
-    public float nextPageTurningSpeed;
-    @Unique
-    public float pageTurningSpeed;
-    @Unique
     public float bookRotation;
     @Unique
     public float lastBookRotation;
     @Unique
     public float targetBookRotation;
+
+    @Unique
+    public boolean isTomeReaderLectern;
 
     @Shadow @Final private Inventory inventory;
 
@@ -51,7 +54,18 @@ public abstract class LecternBlockEntityMixin extends BlockEntity implements Lec
 
     @Inject(method = "createMenu", at = @At("HEAD"), cancellable = true)
     private void openEnchantedBookScreen(int i, PlayerInventory playerInventory, PlayerEntity playerEntity, CallbackInfoReturnable<ScreenHandler> cir) {
-        if(this.inventory.getStack(0).getItem() instanceof EnchantedBookItem) cir.setReturnValue(new LecternEnchantedBookScreenHandler(i, playerInventory, this.inventory));
+        if(this.inventory.getStack(0).getItem() instanceof EnchantedBookItem) cir.setReturnValue(new LecternEnchantedBookScreenHandler(i, playerInventory, this.inventory, this.pos));
+        TomeReader.LOGGER.info("tomeReader: {}", isTomeReaderLectern);
+    }
+
+    @Inject(method = "writeNbt", at = @At("TAIL"))
+    private void writeIsTomeReaderLecternToNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
+        nbt.putBoolean("TomeReader", isTomeReaderLectern);
+    }
+
+    @Inject(method = "readNbt", at = @At("TAIL"))
+    private void readIsTomeReaderLecternToNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
+        this.isTomeReaderLectern = nbt.getBoolean("TomeReader");
     }
 
     @Override
@@ -80,23 +94,8 @@ public abstract class LecternBlockEntityMixin extends BlockEntity implements Lec
     }
 
     @Override
-    public float tomeReader$getNextPageTurningSpeed() {
-        return nextPageTurningSpeed;
-    }
-
-    @Override
-    public float tomeReader$getPageTurningSpeed() {
-        return pageTurningSpeed;
-    }
-
-    @Override
     public float tomeReader$getBookRotation() {
         return bookRotation;
-    }
-
-    @Override
-    public float tomeReader$getLastBookRotation() {
-        return lastBookRotation;
     }
 
     @Override
@@ -130,16 +129,6 @@ public abstract class LecternBlockEntityMixin extends BlockEntity implements Lec
     }
 
     @Override
-    public void tomeReader$setNextPageTurningSpeed(float nextPageTurningSpeed) {
-        this.nextPageTurningSpeed = nextPageTurningSpeed;
-    }
-
-    @Override
-    public void tomeReader$setPageTurningSpeed(float pageTurningSpeed) {
-        this.pageTurningSpeed = pageTurningSpeed;
-    }
-
-    @Override
     public void tomeReader$setBookRotation(float bookRotation) {
         this.bookRotation = bookRotation;
     }
@@ -154,5 +143,13 @@ public abstract class LecternBlockEntityMixin extends BlockEntity implements Lec
         this.targetBookRotation = targetBookRotation;
     }
 
+    @Override
+    public boolean tomeReader$isTomeReaderLectern() {
+        return isTomeReaderLectern;
+    }
 
+    @Override
+    public void tomeReader$setIsTomeReaderLectern(boolean val) {
+        this.isTomeReaderLectern = val;
+    }
 }

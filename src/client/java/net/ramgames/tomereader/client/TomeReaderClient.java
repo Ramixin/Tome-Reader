@@ -5,9 +5,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.block.entity.LecternBlockEntity;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.ramgames.tomereader.TomeReader;
-import net.ramgames.tomereader.payloads.ItemStackSyncS2CLoad;
 import net.ramgames.tomereader.client.screens.LecternEnchantedBookScreen;
+import net.ramgames.tomereader.payloads.ItemStackSyncS2CLoad;
 import net.ramgames.tomereader.screenhandlers.LecternEnchantedBookScreenHandler;
 
 public class TomeReaderClient implements ClientModInitializer {

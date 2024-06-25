@@ -12,13 +12,7 @@ public interface LecternAccess {
 
     float tomeReader$getFlipTurn();
 
-    float tomeReader$getNextPageTurningSpeed();
-
-    float tomeReader$getPageTurningSpeed();
-
     float tomeReader$getBookRotation();
-
-    float tomeReader$getLastBookRotation();
 
     float tomeReader$getTargetBookRotation();
 
@@ -32,14 +26,13 @@ public interface LecternAccess {
 
     void tomeReader$setFlipTurn(float flipTurn);
 
-    void tomeReader$setNextPageTurningSpeed(float nextPageTurningSpeed);
-
-    void tomeReader$setPageTurningSpeed(float pageTurningSpeed);
-
     void tomeReader$setBookRotation(float bookRotation);
 
     void tomeReader$setLastBookRotation(float lastBookRotation);
 
     void tomeReader$setTargetBookRotation(float targetBookRotation);
 
+    boolean tomeReader$isTomeReaderLectern();
+
+    void tomeReader$setIsTomeReaderLectern(boolean val);
 }

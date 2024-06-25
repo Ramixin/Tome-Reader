@@ -9,6 +9,8 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.LecternBlockEntityRenderer;
 import net.minecraft.client.render.entity.model.BookModel;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -33,11 +35,32 @@ public abstract class LecternBlockEntityRendererMixin implements BlockEntityRend
     @Unique
     public HashMap<BlockPos, Random> randoms = new HashMap<>();
 
-    @SuppressWarnings({"ExtractMethodRecommender", "StatementWithEmptyBody"})
     @Inject(method = "render(Lnet/minecraft/block/entity/LecternBlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V", at = @At("HEAD"), cancellable = true)
     private void flipBookPages(LecternBlockEntity lecternBlockEntity, float f, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, CallbackInfo ci) {
-        if(lecternBlockEntity.getBook().getItem() != Items.ENCHANTED_BOOK) return;
+        ItemStack stack = lecternBlockEntity.getBook();
+        if(stack.getItem() != Items.ENCHANTED_BOOK) return;
         LecternAccess access = TomeReader.getAccess(lecternBlockEntity);
+        if(stack.get(DataComponentTypes.CUSTOM_DATA) != null && stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt().getBoolean("sealed")) renderClosedBook(matrixStack, vertexConsumerProvider, i ,j, ci);
+        else renderNonClosedBook(access, lecternBlockEntity, f, matrixStack, vertexConsumerProvider, i, j, ci);
+    }
+
+    @Unique
+    private void renderClosedBook(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, CallbackInfo ci) {
+        matrixStack.push();
+        matrixStack.translate(0.5F, 1.0625F, 0.5F);
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90));
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(115));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(0));
+        matrixStack.translate(-0.19F, 0.1, -0.06F);
+        book.setPageAngles(0,0,0,0);
+        VertexConsumer vertexConsumer = BOOK_TEXTURE.getVertexConsumer(vertexConsumerProvider, RenderLayer::getEntitySolid);
+        book.renderBook(matrixStack, vertexConsumer, i, j, -1);
+        matrixStack.pop();
+        ci.cancel();
+    }
+
+    @Unique
+    private void renderNonClosedBook(LecternAccess access, LecternBlockEntity lecternBlockEntity, float f, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, CallbackInfo ci) {
         access.tomeReader$setLastBookRotation(access.tomeReader$getBookRotation());
         access.tomeReader$setTargetBookRotation(access.tomeReader$getTargetBookRotation()+0.02F);
 
