@@ -19,7 +19,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.ramgames.tomereader.LecternAccess;
-import net.ramgames.tomereader.TomeReader;
 
 public class LecternEnchantedBookScreenHandler extends ScreenHandler {
 
@@ -73,11 +72,7 @@ public class LecternEnchantedBookScreenHandler extends ScreenHandler {
             ItemStack itemStack = this.inventory.removeStack(0);
             this.inventory.markDirty();
             if (!player.getInventory().insertStack(itemStack)) player.dropItem(itemStack, false);
-            if(player.getWorld().getBlockEntity(lecternPos) != null) {
-                ((LecternAccess) player.getWorld().getBlockEntity(lecternPos)).tomeReader$setIsTomeReaderLectern(false);
-                TomeReader.LOGGER.info("setting to false...");
-                TomeReader.LOGGER.info("result: {}", ((LecternAccess) player.getWorld().getBlockEntity(lecternPos)).tomeReader$isTomeReaderLectern());
-            }
+            if(player.getWorld().getBlockEntity(lecternPos) != null) ((LecternAccess) player.getWorld().getBlockEntity(lecternPos)).tomeReader$setIsTomeReaderLectern(false);
             return true;
         }
         else if(id == 4) {

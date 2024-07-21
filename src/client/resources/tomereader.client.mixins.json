@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.ramgames.tomereader.client.mixins.client",
+  "package": "net.ramgames.tomereader.mixins.client",
   "compatibilityLevel": "JAVA_17",
   "client": [
     "LecternBlockEntityRendererMixin"

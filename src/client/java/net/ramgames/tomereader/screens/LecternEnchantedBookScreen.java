@@ -1,4 +1,4 @@
-package net.ramgames.tomereader.client.screens;
+package net.ramgames.tomereader.screens;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -65,10 +65,10 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
         renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         Pair<List<Text>, Integer> tooltip = generateToolTip();
-        int y = this.y+(backgroundHeight)/2+5;
-        y -= 10 * (tooltip.getLeft().size()-3);
+        int y = 165;
+        y -= 10 * (tooltip.getLeft().size());
         drawBook(context, this.width/2, y, delta);
-        context.drawTooltip(this.textRenderer, tooltip.getLeft(), (context.getScaledWindowWidth()-tooltip.getRight()-22)/2, this.height/2+30-(tooltip.getLeft().size()-3)*10);
+        context.drawTooltip(this.textRenderer, tooltip.getLeft(), (context.getScaledWindowWidth()-tooltip.getRight()-22)/2, 165-(tooltip.getLeft().size()-3)*10);
         if(transferButton != null) {
             context.drawTexture(ENCHANTMENT_TABLE_TEXTURE,this.width / 2 - 98, 222, 32, transferButton.active ? 223 : 239, 16, 16);
         }
@@ -107,6 +107,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
         if(stack.contains(DataComponentTypes.CUSTOM_NAME)) name.formatted(Formatting.ITALIC);
         list.add(name);
         if(stack.contains(DataComponentTypes.STORED_ENCHANTMENTS))
+            //noinspection DataFlowIssue
             stack.get(DataComponentTypes.STORED_ENCHANTMENTS).appendTooltip(Item.TooltipContext.DEFAULT, list::add, TooltipType.BASIC);
         int max = 0;
         for(Text text : list) max = Math.max(max, textRenderer.getWidth(text));
@@ -169,6 +170,7 @@ public class LecternEnchantedBookScreen extends HandledScreen<LecternEnchantedBo
 
     private void updateTransferButton() {
         if(this.transferButton == null) return;
+        //noinspection DataFlowIssue
         if(handler.getInventory().getStack(0).contains(DataComponentTypes.STORED_ENCHANTMENTS) && handler.getInventory().getStack(0).get(DataComponentTypes.STORED_ENCHANTMENTS).getSize() <= 1) {
             if(transferButton.active || disabledIndex != 1) {
                 transferButton.active = false;

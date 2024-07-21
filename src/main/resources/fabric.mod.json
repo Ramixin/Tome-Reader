@@ -8,14 +8,14 @@
     "RamGames"
   ],
   "contact": {
-    "repo": "https://github.com/RamGemes/TomeReader"
+    "repo": "https://github.com/Ramixin/TomeReader"
   },
   "license": "MIT",
   "icon": "assets/tomereader/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
-      "net.ramgames.tomereader.client.TomeReaderClient"
+      "net.ramgames.tomereader.TomeReaderClient"
     ],
     "main": [
       "net.ramgames.tomereader.TomeReader"

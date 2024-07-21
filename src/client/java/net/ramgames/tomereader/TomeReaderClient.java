@@ -1,11 +1,11 @@
-package net.ramgames.tomereader.client;
+package net.ramgames.tomereader;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.block.entity.LecternBlockEntity;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.ramgames.tomereader.client.screens.LecternEnchantedBookScreen;
+import net.ramgames.tomereader.screens.LecternEnchantedBookScreen;
 import net.ramgames.tomereader.payloads.ItemStackSyncS2CLoad;
 import net.ramgames.tomereader.screenhandlers.LecternEnchantedBookScreenHandler;
 

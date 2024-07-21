@@ -13,7 +13,6 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import net.ramgames.tomereader.LecternAccess;
-import net.ramgames.tomereader.TomeReader;
 import net.ramgames.tomereader.screenhandlers.LecternEnchantedBookScreenHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,7 +54,6 @@ public abstract class LecternBlockEntityMixin extends BlockEntity implements Lec
     @Inject(method = "createMenu", at = @At("HEAD"), cancellable = true)
     private void openEnchantedBookScreen(int i, PlayerInventory playerInventory, PlayerEntity playerEntity, CallbackInfoReturnable<ScreenHandler> cir) {
         if(this.inventory.getStack(0).getItem() instanceof EnchantedBookItem) cir.setReturnValue(new LecternEnchantedBookScreenHandler(i, playerInventory, this.inventory, this.pos));
-        TomeReader.LOGGER.info("tomeReader: {}", isTomeReaderLectern);
     }
 
     @Inject(method = "writeNbt", at = @At("TAIL"))

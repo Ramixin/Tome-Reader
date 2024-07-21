@@ -4,13 +4,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.ramgames.tomereader.TomeReader;
 
 public record ItemStackSyncS2CLoad(BlockPos pos, ItemStack stack) implements CustomPayload {
 
-    public static final CustomPayload.Id<ItemStackSyncS2CLoad> PACKET_ID = new CustomPayload.Id<>(Identifier.of(TomeReader.MOD_ID,"item_sync"));
+    public static final CustomPayload.Id<ItemStackSyncS2CLoad> PACKET_ID = new CustomPayload.Id<>(TomeReader.ITEM_SYNC);
     public static final PacketCodec<RegistryByteBuf, ItemStackSyncS2CLoad> PACKET_CODEC = PacketCodec.of(ItemStackSyncS2CLoad::write, ItemStackSyncS2CLoad::new);
 
 

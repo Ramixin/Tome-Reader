@@ -1,5 +1,7 @@
-package net.ramgames.tomereader.client.mixins.client;
+package net.ramgames.tomereader.mixins.client;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.block.entity.LecternBlockEntity;
 import net.minecraft.client.render.RenderLayer;
@@ -40,17 +42,27 @@ public abstract class LecternBlockEntityRendererMixin implements BlockEntityRend
         ItemStack stack = lecternBlockEntity.getBook();
         if(stack.getItem() != Items.ENCHANTED_BOOK) return;
         LecternAccess access = TomeReader.getAccess(lecternBlockEntity);
-        if(stack.get(DataComponentTypes.CUSTOM_DATA) != null && stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt().getBoolean("sealed")) renderClosedBook(matrixStack, vertexConsumerProvider, i ,j, ci);
+        //noinspection DataFlowIssue
+        if(stack.get(DataComponentTypes.CUSTOM_DATA) != null && stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt().getBoolean("sealed")) renderClosedBook(lecternBlockEntity, matrixStack, vertexConsumerProvider, i ,j, ci);
         else renderNonClosedBook(access, lecternBlockEntity, f, matrixStack, vertexConsumerProvider, i, j, ci);
     }
 
     @Unique
-    private void renderClosedBook(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, CallbackInfo ci) {
+    private void renderClosedBook(LecternBlockEntity lecternBlockEntity, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, CallbackInfo ci) {
+        if(lecternBlockEntity.getWorld() == null) return;
+        BlockState state = lecternBlockEntity.getWorld().getBlockState(lecternBlockEntity.getPos());
+        if(state.getBlock() != Blocks.LECTERN) return;
         matrixStack.push();
         matrixStack.translate(0.5F, 1.0625F, 0.5F);
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90));
+        float y;
+        switch (state.get(LecternBlock.FACING)) {
+            case EAST -> y = 90;
+            case NORTH -> y = 180;
+            case WEST -> y = 270;
+            default -> y = 0;
+        }
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(y));
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(115));
-        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(0));
         matrixStack.translate(-0.19F, 0.1, -0.06F);
         book.setPageAngles(0,0,0,0);
         VertexConsumer vertexConsumer = BOOK_TEXTURE.getVertexConsumer(vertexConsumerProvider, RenderLayer::getEntitySolid);
@@ -73,6 +85,8 @@ public abstract class LecternBlockEntityRendererMixin implements BlockEntityRend
         while(access.tomeReader$getTargetBookRotation() < -3.1415927F) access.tomeReader$setTargetBookRotation(access.tomeReader$getTargetBookRotation() + 6.2831855F);
 
         float g;
+        // Mojang's code, not my problem
+        //noinspection StatementWithEmptyBody
         for(g = access.tomeReader$getTargetBookRotation() - access.tomeReader$getBookRotation(); g >= 3.1415927F; g -= 6.2831855F);
 
         while(g < -3.1415927F) g += 6.2831855F;
